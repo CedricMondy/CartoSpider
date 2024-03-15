@@ -33,7 +33,7 @@ mod_selector_pane_server <- function(id, what){
         })
 
         updateSelectizeInput(session, 'species',
-                             choices = c("Select a species" = "",
+                             choices = c("Choose a species" = "",
                                          wsc_locations |>
                                            dplyr::group_by(family) |>
                                            dplyr::group_split() |>
