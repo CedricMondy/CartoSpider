@@ -19,58 +19,44 @@ mod_selector_pane_server <- function(id, what){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
-    observe({
-      req(what)
+    output$select_what <- renderUI({
+      selectizeInput(
+        inputId = ns("selection"),
+        label = NULL,
+        choices = c("") |>
+          purrr::set_names(paste0("Choose a ", what())),
+        multiple = FALSE
+      )
+    })
 
-      if (what() == "species") {
-        output$select_what <- renderUI({
-          selectizeInput(
-            inputId = ns("species"),
-            label = NULL,
-            choices = c("Select a species" = ""),
-            multiple = FALSE
-          )
-        })
-
-        updateSelectizeInput(session, 'species',
-                             choices = c("Choose a species" = "",
-                                         wsc_locations |>
-                                           dplyr::group_by(family) |>
-                                           dplyr::group_split() |>
-                                           purrr::map(dplyr::pull, species) |>
-                                           purrr::set_names(sort(unique(wsc_locations$family)))
-                             ),
-                             server = TRUE)
-
-      }
-
-      if (what() == "country") {
-        output$select_what <- renderUI({
-          selectizeInput(
-            inputId = ns("country"),
-            label = NULL,
-            choices = c("Choose a country" = "",
-                        loc_geoms |>
-                          sf::st_drop_geometry() |>
-                          dplyr::filter(is_country) |>
-                          dplyr::arrange(continent, location) |>
+    observeEvent(what(), {
+      if(what() == "species") {
+        updateSelectizeInput(session, 'selection',
+                           choices = c("Choose a species" = "",
+                                       species_list |>
+                                         dplyr::arrange(family, species) |>
+                                         dplyr::group_by(family) |>
+                                         dplyr::group_split() |>
+                                         purrr::map(dplyr::pull, species) |>
+                                         purrr::set_names(sort(unique(wsc_locations$family)))
+                           ),
+                           server = TRUE)
+      } else {
+        updateSelectizeInput(
+        session, "selection",
+        choices = c("Choose a country" = "",
+                        country_list |>
+                          dplyr::arrange(continent, country) |>
                           dplyr::group_by(continent) |>
                           dplyr::group_split() |>
-                          purrr::map(dplyr::pull, location) |>
-                          purrr::set_names(sort(unique(loc_geoms$continent)))
-                        )
-          )
-        })
+                          purrr::map(dplyr::pull, country) |>
+                          purrr::set_names(sort(unique(country_list$continent))))
+      )
       }
+
     })
 
-    reactive({
-      if (what() == "species") {
-        input$species
-      } else {
-        input$country
-      }
-    })
+    reactive(input$selection)
 
   })
 }

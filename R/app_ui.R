@@ -11,7 +11,7 @@ app_ui <- function(request) {
       div(
         style = "display: flex; align-items: center;",
         tags$img(src = "www/CartoSpider.png", width = "50px", height = "50px", style = "margin-right: 10px;"),
-        h1("  CartoSpider: Spiders across the world")
+        h1("  CartoSpider: Spiders around the world")
       ),
       div(),
       # Panneau latéral avec sélecteurs
@@ -34,9 +34,11 @@ app_ui <- function(request) {
         # Division en deux colonnes
         mainPanel(
           # Colonne 1 : Carte Leaflet
-          column(width = 6),
+          column(width = 6,
+                 mod_map_ui("map")),
           # Colonne 2 : Tableau DT
-          column(width = 6),
+          column(width = 6,
+                 mod_table_ui("table")),
           width = 9
         )
       )

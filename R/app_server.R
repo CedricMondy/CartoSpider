@@ -9,6 +9,6 @@ app_server <- function(input, output, session) {
 
   selection <- mod_selector_pane_server("selectors", what)
 
-  observe(print(selection()))
-
+  mod_map_server("map", what, selection)
+  mod_table_server("table", what, selection)
 }
